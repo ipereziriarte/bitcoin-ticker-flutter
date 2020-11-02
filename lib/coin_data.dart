@@ -38,14 +38,18 @@ const apikey = 'Get api key from email here';
 
 class CoinData {
   Future getCoinData(String selectedCurrency) async {
-    String requestURL = '$coinAPIURL/BTC/$selectedCurrency?apikey=$apikey';
-    http.Response response = await http.get(requestURL);
+    Map<String, String> cryptoPrices = {};
+    for (String crypto in cryptoList) {
+      String requestURL = '$coinAPIURL/$crypto/$selectedCurrency?apikey=$apikey';
+      http.Response response = await http.get(requestURL);
 
-    if (response.statusCode == 200) {
-      var decodedData = jsonDecode(response.body);
-      return decodedData['rate'];
-    } else {
-      throw 'Error {$response.statusCode} fetching data';
+      if (response.statusCode == 200) {
+        var decodedData = jsonDecode(response.body);
+        double price = decodedData['rate'];
+        cryptoPrices[crypto] = price.toStringAsFixed(0);
+      } else {
+        throw 'Error {$response.statusCode} fetching data';
+      }
     }
   }
 }
